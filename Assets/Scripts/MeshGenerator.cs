@@ -5,7 +5,9 @@ public static class MeshGenerator {
 
 
 	//heightMultiplier is for making the map not flat, heightCurve is for making it so the water doesn't also increase in height. heightCurve should match the level of the water near exactly.
-	public static MeshData GenerateTerrainMesh(float[,] heightMap, float heightMultiplier, AnimationCurve heightCurve, int levelOfDetail) {
+	public static MeshData GenerateTerrainMesh(float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int levelOfDetail) {
+		AnimationCurve heightCurve = new AnimationCurve(_heightCurve.keys);
+
 		int width = heightMap.GetLength (0);
 		int height = heightMap.GetLength (1);
 		float topLeftX = (width - 1) / -2f;
