@@ -6,6 +6,8 @@ public class InfiniteTerrain : MonoBehaviour
 {
     public static float maxViewDistance;
 
+    const float scale = 5f; //This can be changed to alter to scale of the map, ie if you want it to better fit your players scale
+
     public LODInfo[] detailLevels;
 
     public Transform viewer; //the player
@@ -37,7 +39,7 @@ public class InfiniteTerrain : MonoBehaviour
 
     void Update()
     {
-        viewerPosition = new Vector2(viewer.position.x,viewer.position.z);
+        viewerPosition = new Vector2(viewer.position.x,viewer.position.z) / scale; //dividing by scale keeps this in sync with our map scale
         if ((viewerPositionOld - viewerPosition).sqrMagnitude > sqrViewerMoveThresholdForChunkUpdate) { //determine when to update chunks
             viewerPositionOld = viewerPosition;
             UpdateVisibleChunks();
@@ -69,7 +71,7 @@ public class InfiniteTerrain : MonoBehaviour
                 }
                 else
                 {
-                    terrainChunkDictionary.Add(viewedChunkCoord, new TerrainChunk(viewedChunkCoord,chunkSize, detailLevels, transform.parent, mapMaterial));
+                    terrainChunkDictionary.Add(viewedChunkCoord, new TerrainChunk(viewedChunkCoord,chunkSize, detailLevels, transform, mapMaterial));
                 }
             }
         }
@@ -105,7 +107,8 @@ public class InfiniteTerrain : MonoBehaviour
             meshFilter = meshObject.AddComponent<MeshFilter>();
             meshRenderer.material = material;
 
-            meshObject.transform.position = positionV3;
+            meshObject.transform.position = positionV3 * scale; //scale is for scaling the entire map size
+            meshObject.transform.localScale = Vector3.one * scale;
            
             meshObject.transform.parent = parent; //set the meshObject to be parented under the parent, keeps the editor clean from non-parented objects
             SetVisible(false);
