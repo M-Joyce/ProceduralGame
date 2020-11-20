@@ -5,7 +5,7 @@ public static class MeshGenerator {
 
 
 	//heightMultiplier is for making the map not flat, heightCurve is for making it so the water doesn't also increase in height. heightCurve should match the level of the water near exactly.
-	public static MeshData GenerateTerrainMesh(float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int levelOfDetail) {
+	public static MeshData GenerateTerrainMesh(float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int levelOfDetail, bool useFlatShading) {
 		AnimationCurve heightCurve = new AnimationCurve(_heightCurve.keys);
 
 		int meshSimplificationIncrement = (levelOfDetail == 0) ? 1 : levelOfDetail * 2; //if LOD = 0 set meshSimplIncr = 1, otherwise set it to LOD * 2
@@ -19,7 +19,7 @@ public static class MeshGenerator {
 
 		int verticesPerLine = (meshSize - 1) / meshSimplificationIncrement + 1;
 
-		MeshData meshData = new MeshData (verticesPerLine);
+		MeshData meshData = new MeshData (verticesPerLine, useFlatShading);
 
 		int[,] vertexIndicesMap = new int[borderedSize, borderedSize];
 		int meshVertexIndex = 0;
@@ -64,6 +64,7 @@ public static class MeshGenerator {
 				vertexIndex++;
 			}
 		}
+		meshData.FinalizeProcessMesh();
 
 		return meshData;
 
@@ -74,6 +75,7 @@ public class MeshData {
 	Vector3[] vertices;
 	int[] triangles;
 	Vector2[] uvs;
+	Vector3[] bakedNormals;
 
 	Vector3[] borderVertices;
 	int[] borderTriangles;
@@ -81,7 +83,10 @@ public class MeshData {
 	int triangleIndex;
 	int borderTriangleIndex;
 
-	public MeshData(int verticesPerLine) {
+	bool useFlatShading; //use flat shading or not
+
+	public MeshData(int verticesPerLine, bool useFlatShading) {
+		this.useFlatShading = useFlatShading;
 		vertices = new Vector3[verticesPerLine * verticesPerLine];
 		uvs = new Vector2[verticesPerLine * verticesPerLine];
 		triangles = new int[(verticesPerLine-1)*(verticesPerLine-1)*6];
@@ -184,12 +189,52 @@ public class MeshData {
 
 	}
 
+	private void BakeNormals() //using this to separate CalculateNormals off the main thread
+    {
+		bakedNormals = CalculateNormals();
+    }
+
+	public void FinalizeProcessMesh()
+    {
+        if (useFlatShading)
+        {
+			FlatShading();
+        }
+        else
+        {
+			BakeNormals(); //don't need to bake normals for flat shading, since no edges of chunks are needed to be be blended
+        }
+    }
+
+	void FlatShading() //flat shading option, no blended shading
+    {
+		Vector3[] flatShadedVertices = new Vector3[triangles.Length];
+		Vector2[] flatShadedUvs = new Vector2[triangles.Length];
+
+        for (int i=0; i < triangles.Length; i++)
+        {
+			flatShadedVertices[i] = vertices[triangles[i]];
+			flatShadedUvs[i] = uvs[triangles[i]];
+			triangles[i] = i;
+        }
+		vertices = flatShadedVertices;
+		uvs = flatShadedUvs;
+    }
+
 	public Mesh CreateMesh() {
 		Mesh mesh = new Mesh ();
 		mesh.vertices = vertices;
 		mesh.triangles = triangles;
 		mesh.uv = uvs;
-        mesh.normals = CalculateNormals();
+
+        if (useFlatShading)
+        {
+			mesh.RecalculateNormals();
+        }
+        else
+        {
+			mesh.normals = bakedNormals;
+		}
 		return mesh;
 	}
 

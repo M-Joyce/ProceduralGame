@@ -85,9 +85,11 @@ public class InfiniteTerrain : MonoBehaviour
 
         MeshRenderer meshRenderer;
         MeshFilter meshFilter;
+        MeshCollider meshCollider;
 
         LODInfo[] detailLevels;
         LODMesh[] lodMeshes;
+        LODMesh collisionLODMesh;
         int previousLODIndex = -1;
 
         MapData mapData;
@@ -105,6 +107,8 @@ public class InfiniteTerrain : MonoBehaviour
             meshObject = new GameObject("TerrainChunk");
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
             meshFilter = meshObject.AddComponent<MeshFilter>();
+            meshCollider = meshObject.AddComponent<MeshCollider>();
+
             meshRenderer.material = material;
 
             meshObject.transform.position = positionV3 * scale; //scale is for scaling the entire map size
@@ -117,6 +121,10 @@ public class InfiniteTerrain : MonoBehaviour
             for (int i = 0; i < detailLevels.Length; i++)
             {
                 lodMeshes[i] = new LODMesh(detailLevels[i].lod,UpdateTerrainChunk);
+                if (detailLevels[i].useForCollider)
+                {
+                    collisionLODMesh = lodMeshes[i];
+                }
             }
 
             mapGenerator.RequestMapData(position,OnMapDataReceived);
@@ -160,11 +168,24 @@ public class InfiniteTerrain : MonoBehaviour
                         if (lodMesh.hasMesh)
                         {
                             previousLODIndex = lodIndex;
-                            meshFilter.mesh = lodMesh.mesh;
+                            meshFilter.mesh = lodMesh.mesh;                 
                         }
                         else if (!lodMesh.hasRequestedMesh)
                         {
                             lodMesh.RequestMesh(mapData);
+                        }
+                    }
+
+                    //this if is for LODMesh collider optimization
+                    if (lodIndex==0) //if close enough to player to need a collider
+                    {
+                        if (collisionLODMesh.hasMesh)
+                        {
+                            meshCollider.sharedMesh = collisionLODMesh.mesh;
+                        }
+                        else if (!collisionLODMesh.hasRequestedMesh)
+                        {
+                            collisionLODMesh.RequestMesh(mapData); //request mesh if hasn't yet requested
                         }
                     }
 
@@ -225,6 +246,7 @@ public class InfiniteTerrain : MonoBehaviour
     {
         public int lod;
         public float visibleDstThreshold; //distance which within this LOD is active, once the view is outside of this threshold it switches to the next lower resolution LOD
+        public bool useForCollider; //using the hight level of detail for this is most accurate, but could be slower
     }
 
 }
