@@ -6,7 +6,6 @@ public class InfiniteTerrain : MonoBehaviour
 {
     public static float maxViewDistance;
 
-    const float scale = 5f; //This can be changed to alter to scale of the map, ie if you want it to better fit your players scale
 
     public LODInfo[] detailLevels;
 
@@ -32,14 +31,14 @@ public class InfiniteTerrain : MonoBehaviour
         mapGenerator = FindObjectOfType<MapGenerator>();
 
         maxViewDistance = detailLevels[detailLevels.Length - 1].visibleDstThreshold; //Max view distance is the last LOD setting (this should be the furthest LOD visibleDstThreshold)
-        chunkSize = MapGenerator.mapChunkSize - 1;
+        chunkSize = mapGenerator.mapChunkSize - 1;
         chunksVisible = Mathf.RoundToInt(maxViewDistance/chunkSize);
         UpdateVisibleChunks(); //first update, otherwise Update() will have issues
     }
 
     void Update()
     {
-        viewerPosition = new Vector2(viewer.position.x,viewer.position.z) / scale; //dividing by scale keeps this in sync with our map scale
+        viewerPosition = new Vector2(viewer.position.x,viewer.position.z) / mapGenerator.terrainData.uniformScale; //dividing by scale keeps this in sync with our map scale
         if ((viewerPositionOld - viewerPosition).sqrMagnitude > sqrViewerMoveThresholdForChunkUpdate) { //determine when to update chunks
             viewerPositionOld = viewerPosition;
             UpdateVisibleChunks();
@@ -111,8 +110,8 @@ public class InfiniteTerrain : MonoBehaviour
 
             meshRenderer.material = material;
 
-            meshObject.transform.position = positionV3 * scale; //scale is for scaling the entire map size
-            meshObject.transform.localScale = Vector3.one * scale;
+            meshObject.transform.position = positionV3 * mapGenerator.terrainData.uniformScale; //scale is for scaling the entire map size
+            meshObject.transform.localScale = Vector3.one * mapGenerator.terrainData.uniformScale;
            
             meshObject.transform.parent = parent; //set the meshObject to be parented under the parent, keeps the editor clean from non-parented objects
             SetVisible(false);
@@ -134,9 +133,6 @@ public class InfiniteTerrain : MonoBehaviour
         {
             this.mapData = mapData;
             mapDataReceived = true;
-
-            Texture2D texture = TextureGenerator.TextureFromColourMap(mapData.colorMap, MapGenerator.mapChunkSize, MapGenerator.mapChunkSize);
-            meshRenderer.material.mainTexture = texture;
 
             UpdateTerrainChunk();
         }
