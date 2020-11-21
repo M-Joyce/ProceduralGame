@@ -66,6 +66,7 @@ public class MapGenerator : MonoBehaviour {
 		{
 			display.DrawTexture(TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(mapChunkSize)));
 		}
+		textureData.ApplyToMaterial(terrainMaterial); //Fixes issue introduced in newer unity version. Not in original guide !!!!!!!!!!!!!
 	}
 
 	public void RequestMapData(Vector2 center, Action<MapData> callback) //multi threading
@@ -148,6 +149,9 @@ public class MapGenerator : MonoBehaviour {
 				}
 			}
 		}
+
+		textureData.UpdateMeshHeights(terrainMaterial, terrainData.minHeight, terrainData.maxHeight); //sending info to terrain shader
+
 		return new MapData(noiseMap);
 	}
 

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: DefaultNoise
   m_EditorClassIdentifier: 
   autoUpdate: 1
-  normalizeMode: 1
-  noiseScale: 55
-  octaves: 4
+  normalizeMode: 0
+  noiseScale: 104.5
+  octaves: 5
   persistance: 0.5
   lacunarity: 2
   seed: 0
