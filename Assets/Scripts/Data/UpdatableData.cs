@@ -9,6 +9,7 @@ public class UpdatableData : ScriptableObject
     public bool autoUpdate;
 
 
+#if UNITY_EDITOR //Only compile if in the editor
     protected virtual void OnValidate()
     {
         if (autoUpdate)
@@ -27,4 +28,5 @@ public class UpdatableData : ScriptableObject
 
     }
 
+#endif
 }

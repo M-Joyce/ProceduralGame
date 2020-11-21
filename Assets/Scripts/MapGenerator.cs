@@ -25,7 +25,13 @@ public class MapGenerator : MonoBehaviour {
 	Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
 	Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
 
-	void OnValuesUpdated()
+    private void Awake()
+    {
+		textureData.ApplyToMaterial(terrainMaterial);
+		textureData.UpdateMeshHeights(terrainMaterial, terrainData.minHeight, terrainData.maxHeight); //sending info to terrain shader
+	}
+
+    void OnValuesUpdated()
     {
         if (!Application.isPlaying)
         {
@@ -51,6 +57,8 @@ public class MapGenerator : MonoBehaviour {
 
     public void DrawMapInEditor()
     {
+		textureData.UpdateMeshHeights(terrainMaterial, terrainData.minHeight, terrainData.maxHeight); //sending info to terrain shader
+
 		MapData mapData = GenerateMapData(Vector2.zero);
 
 		MapDisplay display = FindObjectOfType<MapDisplay>();
@@ -133,14 +141,14 @@ public class MapGenerator : MonoBehaviour {
 		if (terrainData.useFalloff)
 		{
 
-            if (falloffMap == null)
-            {
-				falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize + 2);
-            }
-
-			for (int y = 0; y < mapChunkSize+2; y++)
+			if (falloffMap == null)
 			{
-				for (int x = 0; x < mapChunkSize+2; x++)
+				falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize + 2);
+			}
+
+			for (int y = 0; y < mapChunkSize + 2; y++)
+			{
+				for (int x = 0; x < mapChunkSize + 2; x++)
 				{
 					if (terrainData.useFalloff) //if using fallOffMap
 					{
@@ -149,8 +157,6 @@ public class MapGenerator : MonoBehaviour {
 				}
 			}
 		}
-
-		textureData.UpdateMeshHeights(terrainMaterial, terrainData.minHeight, terrainData.maxHeight); //sending info to terrain shader
 
 		return new MapData(noiseMap);
 	}
