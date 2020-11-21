@@ -10,11 +10,13 @@ public class InfiniteTerrain : MonoBehaviour
     public LODInfo[] detailLevels;
 
     public Transform viewer; //the player
-
     public Material mapMaterial; //map material
 
     const float viewerMoveThresholdForChunkUpdate = 25f; //for when to update chunks
     const float sqrViewerMoveThresholdForChunkUpdate = viewerMoveThresholdForChunkUpdate * viewerMoveThresholdForChunkUpdate; //squared
+    const float colliderGenerationDistanceThreshold = 5f; //distance the player needs to be from a chunk border to trigger that chunk to generate a collision mesh/collider
+
+    public int colliderLODIndex;
 
     public static Vector2 viewerPosition;
     Vector2 viewerPositionOld;
@@ -24,7 +26,7 @@ public class InfiniteTerrain : MonoBehaviour
     int chunksVisible; //chunks visible in the view distance
 
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>(); //dictionary of TerrainChunks
-    static List<TerrainChunk> terrainChunksVisibleLastUpdate = new List<TerrainChunk>();
+    static List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
     void Start()
     {
@@ -39,6 +41,15 @@ public class InfiniteTerrain : MonoBehaviour
     void Update()
     {
         viewerPosition = new Vector2(viewer.position.x,viewer.position.z) / mapGenerator.terrainData.uniformScale; //dividing by scale keeps this in sync with our map scale
+
+        if (viewerPosition != viewerPositionOld) //If the player has moved since the last Update(), update the chunks with new collision meshes
+        {
+            foreach(TerrainChunk chunk in visibleTerrainChunks)
+            {
+                chunk.UpdateCollisionMesh();
+            }
+        }
+
         if ((viewerPositionOld - viewerPosition).sqrMagnitude > sqrViewerMoveThresholdForChunkUpdate) { //determine when to update chunks
             viewerPositionOld = viewerPosition;
             UpdateVisibleChunks();
@@ -47,12 +58,13 @@ public class InfiniteTerrain : MonoBehaviour
 
     void UpdateVisibleChunks()
     {
+        HashSet<Vector2> alreadyUpdatedChunkCoords = new HashSet<Vector2>();
 
-        for (int i = 0; i<terrainChunksVisibleLastUpdate.Count;i++)
+        for (int i = visibleTerrainChunks.Count - 1; i>=0; i--)
         {
-            terrainChunksVisibleLastUpdate[i].SetVisible(false); //set all lastUpdate terrainChunks to not visible
+            alreadyUpdatedChunkCoords.Add(visibleTerrainChunks[i].coord);
+            visibleTerrainChunks[i].UpdateTerrainChunk();
         }
-        terrainChunksVisibleLastUpdate.Clear(); //clear the list not that they are all set to not visible
 
         int currentChunkCoordX = Mathf.RoundToInt(viewerPosition.x / chunkSize);
         int currentChunkCoordY = Mathf.RoundToInt(viewerPosition.y / chunkSize);
@@ -63,14 +75,17 @@ public class InfiniteTerrain : MonoBehaviour
             {
                 Vector2 viewedChunkCoord = new Vector2(currentChunkCoordX + xOffset, currentChunkCoordY + yOffset);
 
-                if (terrainChunkDictionary.ContainsKey(viewedChunkCoord))
+                if (!alreadyUpdatedChunkCoords.Contains(viewedChunkCoord)) //dont update the chunk if already updated
                 {
-                    terrainChunkDictionary[viewedChunkCoord].UpdateTerrainChunk();
-                    
-                }
-                else
-                {
-                    terrainChunkDictionary.Add(viewedChunkCoord, new TerrainChunk(viewedChunkCoord,chunkSize, detailLevels, transform, mapMaterial));
+                    if (terrainChunkDictionary.ContainsKey(viewedChunkCoord))
+                    {
+                        terrainChunkDictionary[viewedChunkCoord].UpdateTerrainChunk();
+
+                    }
+                    else
+                    {
+                        terrainChunkDictionary.Add(viewedChunkCoord, new TerrainChunk(viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial));
+                    }
                 }
             }
         }
@@ -88,15 +103,20 @@ public class InfiniteTerrain : MonoBehaviour
 
         LODInfo[] detailLevels;
         LODMesh[] lodMeshes;
-        LODMesh collisionLODMesh;
+        int colliderLODIndex;
         int previousLODIndex = -1;
 
         MapData mapData;
         bool mapDataReceived;
+        bool hasSetCollider;
 
-        public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, Transform parent, Material material)
+        public Vector2 coord;
+
+        public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Material material)
         {
+            this.coord = coord;
             this.detailLevels = detailLevels;
+            this.colliderLODIndex = colliderLODIndex;
 
             position = coord * size;
             bounds = new Bounds(position, Vector2.one * size);
@@ -119,11 +139,13 @@ public class InfiniteTerrain : MonoBehaviour
             lodMeshes = new LODMesh[detailLevels.Length];
             for (int i = 0; i < detailLevels.Length; i++)
             {
-                lodMeshes[i] = new LODMesh(detailLevels[i].lod,UpdateTerrainChunk);
-                if (detailLevels[i].useForCollider)
+                lodMeshes[i] = new LODMesh(detailLevels[i].lod);
+                lodMeshes[i].updateCallback += UpdateTerrainChunk;
+                if (i == colliderLODIndex)
                 {
-                    collisionLODMesh = lodMeshes[i];
+                    lodMeshes[i].updateCallback += UpdateCollisionMesh;
                 }
+
             }
 
             mapGenerator.RequestMapData(position,OnMapDataReceived);
@@ -142,6 +164,7 @@ public class InfiniteTerrain : MonoBehaviour
             if (mapDataReceived)
             {
                 float viewerDistanceFromNearestEdge = Mathf.Sqrt(bounds.SqrDistance(viewerPosition));
+                bool wasVisible = isVisible();
                 bool visible = viewerDistanceFromNearestEdge <= maxViewDistance; //is this terrain visible;
 
                 if (visible)
@@ -172,27 +195,44 @@ public class InfiniteTerrain : MonoBehaviour
                         }
                     }
 
-                    //this if is for LODMesh collider optimization
-                    if (lodIndex==0) //if close enough to player to need a collider
-                    {
-                        if (collisionLODMesh.hasMesh)
-                        {
-                            meshCollider.sharedMesh = collisionLODMesh.mesh;
-                        }
-                        else if (!collisionLODMesh.hasRequestedMesh)
-                        {
-                            collisionLODMesh.RequestMesh(mapData); //request mesh if hasn't yet requested
-                        }
-                    }
-
-                    terrainChunksVisibleLastUpdate.Add(this);
-
                 }
 
-                SetVisible(visible);
+                if (wasVisible != visible) {
+                    if (visible)
+                    {
+                        visibleTerrainChunks.Add(this);
+                    }
+                    else{
+                        visibleTerrainChunks.Remove(this);
+                    }
+                    SetVisible(visible);
+                }
             }
         }
 
+        public void UpdateCollisionMesh()
+        {
+            if (!hasSetCollider) { //don't do anything here if the collider has already been set
+                float sqrDstFromViewerToEdge = bounds.SqrDistance(viewerPosition);
+
+                if (sqrDstFromViewerToEdge < detailLevels[colliderLODIndex].sqrVisibleDstThreshold) //ensure the mesh is requested
+                {
+                    if (!lodMeshes[colliderLODIndex].hasRequestedMesh) //if hasnt yet requested a mesh
+                    {
+                        lodMeshes[colliderLODIndex].RequestMesh(mapData); //request mesh
+                    }
+                }
+
+                if (sqrDstFromViewerToEdge < colliderGenerationDistanceThreshold * colliderGenerationDistanceThreshold) //if within distance threshold to generate collision mesh
+                {
+                    if (lodMeshes[colliderLODIndex].hasMesh) //if has mesh
+                    {
+                        meshCollider.sharedMesh = lodMeshes[colliderLODIndex].mesh; //generate collision mesh
+                        hasSetCollider = true;
+                    }
+                }
+            }
+        }
 
         public void SetVisible(bool visible)
         {
@@ -213,9 +253,9 @@ public class InfiniteTerrain : MonoBehaviour
         public bool hasRequestedMesh;
         public bool hasMesh;
         int lod;
-        System.Action updateCallback;
+        public event System.Action updateCallback;
 
-        public LODMesh(int lod, System.Action updateCallback)
+        public LODMesh(int lod)
         {
             this.lod = lod;
             this.updateCallback = updateCallback;
@@ -240,9 +280,18 @@ public class InfiniteTerrain : MonoBehaviour
     [System.Serializable]
     public struct LODInfo
     {
+        [Range(0,MeshGenerator.numSupportedLODs -1)] //constrain number of LODs
         public int lod;
         public float visibleDstThreshold; //distance which within this LOD is active, once the view is outside of this threshold it switches to the next lower resolution LOD
         public bool useForCollider; //using the hight level of detail for this is most accurate, but could be slower
+
+        public float sqrVisibleDstThreshold
+        {
+            get
+            {
+                return visibleDstThreshold * visibleDstThreshold;
+            }
+        }
     }
 
 }

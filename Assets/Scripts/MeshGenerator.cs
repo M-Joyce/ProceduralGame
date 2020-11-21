@@ -3,6 +3,11 @@ using System.Collections;
 
 public static class MeshGenerator {
 
+	public const int numSupportedLODs = 5;
+	public const int numSupportedChunkSizes = 9; //must match length of below array
+	public const int numSupportedFlatShadedChunkSizes = 3; //must match length of below array
+	public static readonly int[] supportedChunkSizes = {48,72,96,120,144,168,192,216,240};
+	public static readonly int[] supportedFlatShadedChunkSizes = {48, 72, 96};
 
 	//heightMultiplier is for making the map not flat, heightCurve is for making it so the water doesn't also increase in height. heightCurve should match the level of the water near exactly.
 	public static MeshData GenerateTerrainMesh(float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int levelOfDetail, bool useFlatShading) {

@@ -15,7 +15,12 @@ public class MapGenerator : MonoBehaviour {
 
 	public Material terrainMaterial;
 
-	[Range(0,6)] //LOD clamped to 0-6
+	[Range(0, MeshGenerator.numSupportedChunkSizes - 1)]
+	public int chunkSizeIndex;
+	[Range(0, MeshGenerator.numSupportedFlatShadedChunkSizes - 1)]
+	public int flatShadedChunkSizeIndex;
+
+	[Range(0,MeshGenerator.numSupportedLODs -1)] //LODs clamped
 	public int editorPreviewLOD; //LOD Setting
 
 	public bool autoUpdate;
@@ -44,16 +49,20 @@ public class MapGenerator : MonoBehaviour {
 		textureData.ApplyToMaterial(terrainMaterial);
     }
 
-	public int mapChunkSize{
-        get{
-            if (terrainData.useFlatShading){
-				return 95;
-            }
-            else{
-				return 239; //chunk size 240 (+ 1 is needed) -2 is for the borders, so 240 - 2 + 1 = 239 ... This formula is important if you change this value
+	public int mapChunkSize
+	{
+		get
+		{
+			if (terrainData.useFlatShading)
+			{
+				return MeshGenerator.supportedFlatShadedChunkSizes[flatShadedChunkSizeIndex] - 1;
 			}
-        }
-    }
+			else
+			{
+				return MeshGenerator.supportedChunkSizes[chunkSizeIndex] - 1;
+			}
+		}
+	}
 
     public void DrawMapInEditor()
     {
