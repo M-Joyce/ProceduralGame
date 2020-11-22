@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 21476d5698190f143a1e05fef77496ca
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - textureRender: {instanceID: 0}
+  - meshFilter: {instanceID: 0}
+  - meshRenderer: {instanceID: 0}
+  - meshSettings: {instanceID: 0}
+  - heightMapSettings: {instanceID: 0}
+  - textureData: {fileID: 11400000, guid: 6eac7a49dda801747bb2ab4070122713, type: 2}
+  - terrainMaterial: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
