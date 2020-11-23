@@ -13,6 +13,11 @@ public class PlayerController : MonoBehaviour
 
     // Start is called before the first frame update
 
+    private void Start()
+    {
+        //Set Cursor to not be visible
+        Cursor.visible = false;
+    }
 
     // Update is called once per frame
     void Update()
