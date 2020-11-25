@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 171bc0500e799c745ba067d4bf34b41d, type: 3}
   m_Name: New Mesh Settings
   m_EditorClassIdentifier: 
-  autoUpdate: 1
+  autoUpdate: 0
   meshScale: 10
   useFlatShading: 0
   chunkSizeIndex: 8

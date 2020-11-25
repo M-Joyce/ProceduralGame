@@ -57,7 +57,7 @@ public class TerrainChunk {
 		//This may not be great but hey it works. Water!
 		GameObject waterTile = GameObject.Instantiate(water);
 		waterTile.transform.parent = meshObject.transform;
-		waterTile.transform.SetPositionAndRotation(new Vector3(position.x, 25, position.y), new Quaternion(0, 0, 0, 0));
+		waterTile.transform.SetPositionAndRotation(new Vector3(position.x, 30, position.y), new Quaternion(0, 0, 0, 0)); //25 is the water level, should probably make this a public variable at some point
 		waterTile.transform.localScale = new Vector3(meshSettings.meshWorldSize/100, 1, meshSettings.meshWorldSize/100);
 
 		lodMeshes = new LODMesh[detailLevels.Length];
