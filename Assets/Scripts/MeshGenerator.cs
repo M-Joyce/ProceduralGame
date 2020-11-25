@@ -62,15 +62,16 @@ public static class MeshGenerator {
 
 					bool createTriangle = x < numVertsPerLine - 1 && y < numVertsPerLine - 1 && (!isEdgeConnectionVertex || (x != 2 && y != 2));
 
-					if (createTriangle) {
+					if (createTriangle) { 
 						int currentIncrement = (isMainVertex && x != numVertsPerLine - 3 && y != numVertsPerLine - 3) ? skipIncrement : 1;
 
 						int a = vertexIndicesMap [x, y];
 						int b = vertexIndicesMap [x + currentIncrement, y];
 						int c = vertexIndicesMap [x, y + currentIncrement];
 						int d = vertexIndicesMap [x + currentIncrement, y + currentIncrement];
-						meshData.AddTriangle (a, d, c);
-						meshData.AddTriangle (d, a, b);
+						//create 2 triangles out of 4 points ABCD essentially a square. 1:ADC 2:DAB
+						meshData.AddTriangle (a, d, c); //triangle 1
+						meshData.AddTriangle (d, a, b); //triangle 2, 1 + 2 makes a square 
 					}
 				}
 			}
@@ -98,7 +99,7 @@ public class MeshData {
 	bool useFlatShading;
 
 	public MeshData(int numVertsPerLine, int skipIncrement, bool useFlatShading) {
-		this.useFlatShading = useFlatShading;
+		this.useFlatShading = useFlatShading; //use flat shading or not
 
 		int numMeshEdgeVertices = (numVertsPerLine - 2) * 4 - 4;
 		int numEdgeConnectionVertices = (skipIncrement - 1) * (numVertsPerLine - 5) / skipIncrement * 4;
@@ -141,11 +142,11 @@ public class MeshData {
 
 	Vector3[] CalculateNormals() {
 
-		Vector3[] vertexNormals = new Vector3[vertices.Length];
+		Vector3[] vertexNormals = new Vector3[vertices.Length]; //for storing the normals
 		int triangleCount = triangles.Length / 3;
 		for (int i = 0; i < triangleCount; i++) {
 			int normalTriangleIndex = i * 3;
-			int vertexIndexA = triangles [normalTriangleIndex];
+			int vertexIndexA = triangles [normalTriangleIndex]; //3 vertices in each triangles array, thus A B C by addition
 			int vertexIndexB = triangles [normalTriangleIndex + 1];
 			int vertexIndexC = triangles [normalTriangleIndex + 2];
 
@@ -158,7 +159,7 @@ public class MeshData {
 		int borderTriangleCount = outOfMeshTriangles.Length / 3;
 		for (int i = 0; i < borderTriangleCount; i++) {
 			int normalTriangleIndex = i * 3;
-			int vertexIndexA = outOfMeshTriangles [normalTriangleIndex];
+			int vertexIndexA = outOfMeshTriangles [normalTriangleIndex]; //3 vertices in each triangles array, thus A B C by addition
 			int vertexIndexB = outOfMeshTriangles [normalTriangleIndex + 1];
 			int vertexIndexC = outOfMeshTriangles [normalTriangleIndex + 2];
 
@@ -188,24 +189,25 @@ public class MeshData {
 		Vector3 pointB = (indexB < 0)?outOfMeshVertices[-indexB-1] : vertices [indexB];
 		Vector3 pointC = (indexC < 0)?outOfMeshVertices[-indexC-1] : vertices [indexC];
 
-		Vector3 sideAB = pointB - pointA;
+		//use cross-product method to calculate surface normal
+		Vector3 sideAB = pointB - pointA; 
 		Vector3 sideAC = pointC - pointA;
-		return Vector3.Cross (sideAB, sideAC).normalized;
+		return Vector3.Cross (sideAB, sideAC).normalized; //cross product
 	}
 
 	public void ProcessMesh() {
 		if (useFlatShading) {
-			FlatShading ();
+			FlatShading (); //don't need to bake normals for flat shading, since no edges of chunks are needed to be be blended
 		} else {
 			BakeNormals ();
 		}
 	}
 
-	void BakeNormals() {
+	void BakeNormals() { //using this to separate CalculateNormals off the main thread
 		bakedNormals = CalculateNormals ();
 	}
 
-	void FlatShading() {
+	void FlatShading() { // flat shading option, no blended shading
 		Vector3[] flatShadedVertices = new Vector3[triangles.Length];
 		Vector2[] flatShadedUvs = new Vector2[triangles.Length];
 
@@ -224,6 +226,7 @@ public class MeshData {
 		mesh.vertices = vertices;
 		mesh.triangles = triangles;
 		mesh.uv = uvs;
+
 		if (useFlatShading) {
 			mesh.RecalculateNormals ();
 		} else {

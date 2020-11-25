@@ -60,8 +60,8 @@
 
 				float3 baseColour = baseColours[i] * baseColourStrength[i];
 				float3 textureColour = triplanar(IN.worldPos, baseTextureScales[i], blendAxes, i) * (1-baseColourStrength[i]);
-
-				o.Albedo = o.Albedo * (1-drawStrength) + (baseColour+textureColour) * drawStrength;
+				o.Albedo = o.Albedo * (1 - drawStrength) + (baseColour + textureColour) * drawStrength;
+	
 			}
 
 		

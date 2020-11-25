@@ -8,6 +8,7 @@ public class HeightMapSettings : UpdatableData {
 
 	public bool useFalloff;
 
+	//heightMultiplier is for making the map not flat, heightCurve is for making it so the water doesn't also increase in height. heightCurve should match the level of the water near exactly.
 	public float heightMultiplier;
 	public AnimationCurve heightCurve;
 

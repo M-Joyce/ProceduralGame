@@ -5,7 +5,9 @@ public class TerrainChunk {
 	const float colliderGenerationDistanceThreshold = 5f;
 	public event System.Action<TerrainChunk, bool> onVisibilityChanged;
 	public Vector2 coord;
-	 
+
+	GameObject water = Resources.Load("waterPrefab") as GameObject;
+
 	GameObject meshObject;
 	Vector2 sampleCentre;
 	Bounds bounds;
@@ -50,6 +52,13 @@ public class TerrainChunk {
 		meshObject.transform.position = new Vector3(position.x,0,position.y);
 		meshObject.transform.parent = parent; //set the meshObject to be parented under the parent, keeps the editor clean from non-parented objects
 		SetVisible(false);
+
+
+		//This may not be great but hey it works. Water!
+		GameObject waterTile = GameObject.Instantiate(water);
+		waterTile.transform.parent = meshObject.transform;
+		waterTile.transform.SetPositionAndRotation(new Vector3(position.x, 25, position.y), new Quaternion(0, 0, 0, 0));
+		waterTile.transform.localScale = new Vector3(meshSettings.meshWorldSize/100, 1, meshSettings.meshWorldSize/100);
 
 		lodMeshes = new LODMesh[detailLevels.Length];
 		for (int i = 0; i < detailLevels.Length; i++) {
