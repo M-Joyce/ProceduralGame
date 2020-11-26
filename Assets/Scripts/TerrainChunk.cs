@@ -54,11 +54,11 @@ public class TerrainChunk {
 		SetVisible(false);
 
 
-		//This may not be great but hey it works. Water!
+		//This may not be great but hey it works. Water! //TODO probably need to make water work as a mesh to match the Y level, not just a square for the entire chunk
 		GameObject waterTile = GameObject.Instantiate(water);
 		waterTile.transform.parent = meshObject.transform;
-		waterTile.transform.SetPositionAndRotation(new Vector3(position.x, 30, position.y), new Quaternion(0, 0, 0, 0)); //25 is the water level, should probably make this a public variable at some point
-		waterTile.transform.localScale = new Vector3(meshSettings.meshWorldSize/100, 1, meshSettings.meshWorldSize/100);
+		waterTile.transform.SetPositionAndRotation(new Vector3(position.x, 30, position.y), new Quaternion(0, 0, 0, 0)); //30 is the water level, should probably make this a public variable at some point
+		waterTile.transform.localScale = new Vector3(meshSettings.meshWorldSize/10, 1, meshSettings.meshWorldSize/10);
 
 		lodMeshes = new LODMesh[detailLevels.Length];
 		for (int i = 0; i < detailLevels.Length; i++) {
