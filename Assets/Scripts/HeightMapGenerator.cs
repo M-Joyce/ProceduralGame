@@ -6,8 +6,9 @@ public static class HeightMapGenerator {
 
 	static float[,] falloffMap;
 
-	public static HeightMap GenerateHeightMap(int width, int height, HeightMapSettings settings, Vector2 sampleCentre) {
-		float[,] values = Noise.GenerateNoiseMap (width, height, settings.noiseSettings, sampleCentre);
+	public static HeightMap GenerateHeightMap(int width, int height, HeightMapSettings settings, Vector2 sampleCenter) {
+		float[,] values = Noise.GenerateNoiseMap (width, height, settings.noiseSettings, sampleCenter);
+		float[,] biomeValues = BiomeNoiseMap.GenerateBiomeNoiseMap(width, height, settings.biomeNoiseSettings, sampleCenter);
 
 		AnimationCurve heightCurve_threadsafe = new AnimationCurve (settings.heightCurve.keys);
 
@@ -35,21 +36,24 @@ public static class HeightMapGenerator {
 			}
 		}
 
-		return new HeightMap (values, minValue, maxValue);
+		return new HeightMap (values, minValue, maxValue,biomeValues);
 	}
 
 }
 
 public struct HeightMap {
 	public readonly float[,] values;
+	public readonly float[,] biomeValues;
 	public readonly float minValue;
 	public readonly float maxValue;
 
-	public HeightMap (float[,] values, float minValue, float maxValue)
+	public HeightMap (float[,] values, float minValue, float maxValue, float[,] biomeValues)
 	{
 		this.values = values;
 		this.minValue = minValue;
 		this.maxValue = maxValue;
+		this.biomeValues = biomeValues;
 	}
+
 }
 

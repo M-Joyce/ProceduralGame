@@ -5,6 +5,7 @@ using System.Collections;
 public class HeightMapSettings : UpdatableData {
 
 	public NoiseSettings noiseSettings;
+	public BiomeNoiseSettings biomeNoiseSettings;
 
 	public bool useFalloff;
 
@@ -28,7 +29,8 @@ public class HeightMapSettings : UpdatableData {
 
 	protected override void OnValidate() {
 		noiseSettings.ValidateValues ();
-		base.OnValidate ();
+		biomeNoiseSettings.ValidateValues();
+		base.OnValidate();
 	}
 	#endif
 

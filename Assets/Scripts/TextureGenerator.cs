@@ -27,4 +27,30 @@ public static class TextureGenerator {
 		return TextureFromColourMap (colourMap, width, height);
 	}
 
+	public static Texture2D TextureFromBiomeMap(float[,] biomeValues)
+	{
+		int width = biomeValues.GetLength(0);
+		int height = biomeValues.GetLength(1);
+
+		Color[] colorMap = new Color[width * height];
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				Color color;
+				if (biomeValues[x, y] > 0.5)
+				{
+					color = new Color(0.8f, 0.6f, 0.2f, 1f);
+				}
+				else {
+					color = Color.white;
+				}
+
+				colorMap[y * width + x] = color;
+			}
+		}
+
+		return TextureFromColourMap(colorMap, width, height);
+	}
+
 }

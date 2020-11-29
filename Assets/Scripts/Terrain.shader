@@ -16,7 +16,7 @@
 		#pragma target 3.0
 
 		const static int maxLayerCount = 8;
-		const static float epsilon = 1E-4;
+		const static float epsilon = 1E-4; //Very small number, just making sure nothing ever gets to 0
 
 		int layerCount;
 		float3 baseColours[maxLayerCount];

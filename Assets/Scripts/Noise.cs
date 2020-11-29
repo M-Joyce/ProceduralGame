@@ -5,7 +5,7 @@ public static class Noise {
 
 	public enum NormalizeMode {Local, Global}; //local assumes you can render the entire map at once, global is for infinite maps
 
-	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, NoiseSettings settings, Vector2 sampleCentre) {
+	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, NoiseSettings settings, Vector2 sampleCenter) { //terrain/heightmap noise
 		float[,] noiseMap = new float[mapWidth,mapHeight];
 
 		System.Random prng = new System.Random (settings.seed);
@@ -16,8 +16,8 @@ public static class Noise {
 		float frequency = 1;
 
 		for (int i = 0; i < settings.octaves; i++) {
-			float offsetX = prng.Next (-100000, 100000) + settings.offset.x + sampleCentre.x;
-			float offsetY = prng.Next (-100000, 100000) - settings.offset.y - sampleCentre.y;
+			float offsetX = prng.Next (-100000, 100000) + settings.offset.x + sampleCenter.x;
+			float offsetY = prng.Next (-100000, 100000) - settings.offset.y - sampleCenter.y;
 			octaveOffsets [i] = new Vector2 (offsetX, offsetY);
 
 			maxPossibleHeight += amplitude;
