@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: MountainsBiome
   m_EditorClassIdentifier: 
   autoUpdate: 1
-  biomeNoiseSettings: {fileID: 11400000, guid: 86c2e27635b88b4419f7ca64bf42153d, type: 2}
+  biomeNoiseSettings: {fileID: 11400000, guid: 8b8318331f545694fb0a5551ed9432d8, type: 2}
   useFalloff: 0
-  heightMultiplier: 750
+  heightMultiplier: 500
   heightCurve:
     serializedVersion: 2
     m_Curve:
@@ -29,22 +29,40 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.2510215
-      value: 0.22528291
-      inSlope: 0.08409387
-      outSlope: 0.08409387
+      time: 0.24349892
+      value: 0.24035859
+      inSlope: 0.7613795
+      outSlope: 0.7613795
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0.32234487
       outWeight: 0.08746256
     - serializedVersion: 3
-      time: 0.60145396
-      value: 0.70433694
-      inSlope: -0.05597374
-      outSlope: -0.05597374
+      time: 0.38
+      value: 0.286
+      inSlope: -0.020406842
+      outSlope: -0.020406842
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.2144155
+      inWeight: 0.6274173
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.614
+      value: 0.326
+      inSlope: 1.4578953
+      outSlope: 1.4578953
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.30965456
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.773
+      value: 0.677
+      inSlope: 1.0233854
+      outSlope: 1.0233854
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.3929165
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1

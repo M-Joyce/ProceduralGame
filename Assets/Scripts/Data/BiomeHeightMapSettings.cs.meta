@@ -3,7 +3,9 @@ guid: 20de7e71e8288334d899816d164a0244
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - biomeNoiseSettings: {fileID: 11400000, guid: 86c2e27635b88b4419f7ca64bf42153d,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -4,7 +4,7 @@ using System.Collections;
 public static class BiomeNoiseMap {
 
 
-	public static float[,] GenerateBiomeNoiseMap(int mapWidth, int mapHeight, BiomeNoiseSettings settings, Vector2 sampleCenter) { //terrain/heightmap noise
+	public static float[,] GenerateBiomeNoiseMap(int mapWidth, int mapHeight, BiomeNoiseSettings settings, Vector2 sampleCenter) { //biome noise
 		float[,] biomeNoiseMap = new float[mapWidth,mapHeight];
 
 		System.Random prng = new System.Random (settings.seed);
@@ -15,8 +15,8 @@ public static class BiomeNoiseMap {
 		float frequency = 1;
 
 		for (int i = 0; i < settings.octaves; i++) {
-			float offsetX = prng.Next (-10000, 10000) + settings.offset.x + sampleCenter.x;
-			float offsetY = prng.Next (-10000, 10000) - settings.offset.y - sampleCenter.y;
+			float offsetX = prng.Next (-1000000, 1000000) + settings.offset.x + sampleCenter.x;
+			float offsetY = prng.Next (-1000000, 1000000) - settings.offset.y - sampleCenter.y;
 			octaveOffsets [i] = new Vector2 (offsetX, offsetY);
 
 			maxPossibleHeight += amplitude;
@@ -48,7 +48,7 @@ public static class BiomeNoiseMap {
 				biomeNoiseMap [x, y] = noiseHeight;
 
 				
-				 float normalizedHeight = (biomeNoiseMap [x, y] + 1) / (2f * maxPossibleHeight / 2f); //the last division here can be changed a bit from 1-3, just play with it. 2f is nice.
+				float normalizedHeight = (biomeNoiseMap [x, y] + 1) / (2f * maxPossibleHeight / 1.3f); //the last division here can be changed a bit from 1-3, just play with it. 2f is nice.
 				biomeNoiseMap [x, y] = Mathf.SmoothStep(0, 1,normalizedHeight);
 				
 			}
@@ -59,33 +59,4 @@ public static class BiomeNoiseMap {
 		return biomeNoiseMap;
 	}
 
-}
-
-[CreateAssetMenu()]
-[System.Serializable]
-public class BiomeNoiseSettings : UpdatableData
-{
-
-	public float scale = 50;
-	public bool useBiomes;
-
-	public int octaves = 6;
-	[Range(0, 1)]
-	public float persistance = .6f;
-	public float lacunarity = 2;
-
-	public int seed;
-	public Vector2 offset;
-
-
-	public BiomeHeightMapSettings[] biomes; //an array of biome hieght map settings to be accessed
-
-
-	public void ValidateValues()
-	{
-		scale = Mathf.Max(scale, 0.01f);
-		octaves = Mathf.Max(octaves, 1);
-		lacunarity = Mathf.Max(lacunarity, 1);
-		persistance = Mathf.Clamp01(persistance);
-	}
 }
