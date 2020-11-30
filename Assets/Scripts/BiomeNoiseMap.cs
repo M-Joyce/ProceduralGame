@@ -3,7 +3,6 @@ using System.Collections;
 
 public static class BiomeNoiseMap {
 
-	public enum NormalizeMode {Local, Global}; //local assumes you can render the entire map at once, global is for infinite maps
 
 	public static float[,] GenerateBiomeNoiseMap(int mapWidth, int mapHeight, BiomeNoiseSettings settings, Vector2 sampleCenter) { //terrain/heightmap noise
 		float[,] biomeNoiseMap = new float[mapWidth,mapHeight];
@@ -16,16 +15,13 @@ public static class BiomeNoiseMap {
 		float frequency = 1;
 
 		for (int i = 0; i < settings.octaves; i++) {
-			float offsetX = prng.Next (-100000, 100000) + settings.offset.x + sampleCenter.x;
-			float offsetY = prng.Next (-100000, 100000) - settings.offset.y - sampleCenter.y;
+			float offsetX = prng.Next (-10000, 10000) + settings.offset.x + sampleCenter.x;
+			float offsetY = prng.Next (-10000, 10000) - settings.offset.y - sampleCenter.y;
 			octaveOffsets [i] = new Vector2 (offsetX, offsetY);
 
 			maxPossibleHeight += amplitude;
 			amplitude *= settings.persistance;
 		}
-
-		float maxLocalNoiseHeight = float.MinValue;
-		float minLocalNoiseHeight = float.MaxValue;
 
 		float halfWidth = mapWidth / 2f;
 		float halfHeight = mapHeight / 2f;
@@ -49,28 +45,16 @@ public static class BiomeNoiseMap {
 					frequency *= settings.lacunarity;
 				}
 
-				if (noiseHeight > maxLocalNoiseHeight) {
-					maxLocalNoiseHeight = noiseHeight;
-				} 
-				if (noiseHeight < minLocalNoiseHeight) {
-					minLocalNoiseHeight = noiseHeight;
-				}
 				biomeNoiseMap [x, y] = noiseHeight;
 
-				if (settings.normalizeMode == NormalizeMode.Global) {
-					float normalizedHeight = (biomeNoiseMap [x, y] + 1) / (2f * maxPossibleHeight / 2f); //the last division here can be changed a bit from 1-3, just play with it. 2f is nice.
-					biomeNoiseMap [x, y] = Mathf.Clamp (normalizedHeight, 0, int.MaxValue);
-				}
+				
+				 float normalizedHeight = (biomeNoiseMap [x, y] + 1) / (2f * maxPossibleHeight / 2f); //the last division here can be changed a bit from 1-3, just play with it. 2f is nice.
+				biomeNoiseMap [x, y] = Mathf.SmoothStep(0, 1,normalizedHeight);
+				
 			}
 		}
 
-		if (settings.normalizeMode == NormalizeMode.Local) {
-			for (int y = 0; y < mapHeight; y++) {
-				for (int x = 0; x < mapWidth; x++) {
-					biomeNoiseMap [x, y] = Mathf.InverseLerp (minLocalNoiseHeight, maxLocalNoiseHeight, biomeNoiseMap [x, y]);
-				}
-			}
-	}
+		
 
 		return biomeNoiseMap;
 	}
@@ -81,9 +65,9 @@ public static class BiomeNoiseMap {
 [System.Serializable]
 public class BiomeNoiseSettings
 {
-	public BiomeNoiseMap.NormalizeMode normalizeMode;
 
 	public float scale = 50;
+	public bool useBiomes;
 
 	public int octaves = 6;
 	[Range(0, 1)]

@@ -25,8 +25,41 @@ public static class HeightMapGenerator {
 
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				values [i, j] *= heightCurve_threadsafe.Evaluate (values [i, j] - (settings.useFalloff ? falloffMap[i, j] : 0)) * settings.heightMultiplier;
 
+				if (settings.biomeNoiseSettings.useBiomes == true) //make the map using biomes if true
+				{
+					if (biomeValues[i, j] >= 0 && biomeValues[i, j] < 0.3)
+					{
+						values[i, j] *= heightCurve_threadsafe.Evaluate(values[i, j] - (settings.useFalloff ? falloffMap[i, j] : 0)) * settings.heightMultiplier;
+
+					}
+					else if (biomeValues[i, j] >= 0.3 && biomeValues[i, j] < 0.6)
+					{
+
+					}
+					else if (biomeValues[i, j] >= 0.6 && biomeValues[i, j] < 0.9)
+					{
+
+					}
+					else if (biomeValues[i, j] >= 0.9)
+					{
+
+					}
+					else
+					{
+						values[i, j] *= heightCurve_threadsafe.Evaluate(values[i, j] - (settings.useFalloff ? falloffMap[i, j] : 0)) * settings.heightMultiplier;
+					}
+				}
+                else
+                {
+					values[i, j] *= heightCurve_threadsafe.Evaluate(values[i, j] - (settings.useFalloff ? falloffMap[i, j] : 0)) * settings.heightMultiplier;
+				}
+
+					
+
+
+
+				
 				if (values [i, j] > maxValue) {
 					maxValue = values [i, j];
 				}

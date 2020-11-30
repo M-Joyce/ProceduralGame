@@ -38,12 +38,24 @@ public static class TextureGenerator {
 			for (int x = 0; x < width; x++)
 			{
 				Color color;
-				if (biomeValues[x, y] > 0.5)
+				if (biomeValues[x, y] >= 0 && biomeValues[x, y] < 0.3)
 				{
-					color = new Color(0.8f, 0.6f, 0.2f, 1f);
+					color = new Color(0.8f, 0.6f, 0.2f, 1f); //sand color
 				}
+				else if (biomeValues[x, y] >= 0.3 && biomeValues[x, y] < 0.6)
+                {
+					color = Color.red;
+				}
+				else if (biomeValues[x, y] >= 0.6 && biomeValues[x, y] < 0.9)
+				{
+					color = Color.gray;
+				}
+				else if (biomeValues[x, y] >= 0.9)
+				{
+					color = Color.green;
+				}	
 				else {
-					color = Color.white;
+					color = Color.black;
 				}
 
 				colorMap[y * width + x] = color;

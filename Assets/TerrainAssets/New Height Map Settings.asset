@@ -22,9 +22,9 @@ MonoBehaviour:
     seed: 0
     offset: {x: 0, y: 0}
   biomeNoiseSettings:
-    normalizeMode: 1
-    scale: 93.48
-    octaves: 1
+    scale: 10000
+    useBiomes: 1
+    octaves: 2
     persistance: 0.5
     lacunarity: 2
     seed: 0
