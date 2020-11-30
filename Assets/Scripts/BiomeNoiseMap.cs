@@ -61,9 +61,9 @@ public static class BiomeNoiseMap {
 
 }
 
-
+[CreateAssetMenu()]
 [System.Serializable]
-public class BiomeNoiseSettings
+public class BiomeNoiseSettings : UpdatableData
 {
 
 	public float scale = 50;
@@ -76,6 +76,10 @@ public class BiomeNoiseSettings
 
 	public int seed;
 	public Vector2 offset;
+
+
+	public BiomeHeightMapSettings[] biomes; //an array of biome hieght map settings to be accessed
+
 
 	public void ValidateValues()
 	{

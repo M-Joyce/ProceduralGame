@@ -9,7 +9,7 @@ public class TerrainChunk {
 	GameObject water = Resources.Load("waterPrefab") as GameObject;
 
 	GameObject meshObject;
-	Vector2 sampleCentre;
+	Vector2 sampleCenter;
 	Bounds bounds;
 
 	MeshRenderer meshRenderer;
@@ -30,15 +30,18 @@ public class TerrainChunk {
 	MeshSettings meshSettings;
 	Transform viewer;
 
-	public TerrainChunk(Vector2 coord, HeightMapSettings heightMapSettings, MeshSettings meshSettings, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Transform viewer, Material material) {
+	BiomeNoiseSettings biomeNoiseSettings;
+
+	public TerrainChunk(Vector2 coord, HeightMapSettings heightMapSettings, MeshSettings meshSettings, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Transform viewer, Material material, BiomeNoiseSettings biomeNoiseSettings) {
 		this.coord = coord;
 		this.detailLevels = detailLevels;
 		this.colliderLODIndex = colliderLODIndex;
 		this.heightMapSettings = heightMapSettings;
 		this.meshSettings = meshSettings;
 		this.viewer = viewer;
+		this.biomeNoiseSettings = biomeNoiseSettings;
 
-		sampleCentre = coord * meshSettings.meshWorldSize / meshSettings.meshScale;
+		sampleCenter = coord * meshSettings.meshWorldSize / meshSettings.meshScale;
 		Vector2 position = coord * meshSettings.meshWorldSize ;
 		bounds = new Bounds(position,Vector2.one * meshSettings.meshWorldSize );
 
@@ -74,7 +77,7 @@ public class TerrainChunk {
 	}
 
 	public void Load() {
-		ThreadedDataRequester.RequestData(() => HeightMapGenerator.GenerateHeightMap (meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, sampleCentre), OnHeightMapReceived);
+		ThreadedDataRequester.RequestData(() => HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, sampleCenter, biomeNoiseSettings), OnHeightMapReceived);
 	}
 
 

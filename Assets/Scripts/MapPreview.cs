@@ -13,6 +13,7 @@ public class MapPreview : MonoBehaviour {
 
 	public MeshSettings meshSettings;
 	public HeightMapSettings heightMapSettings;
+	public BiomeNoiseSettings biomeNoiseSettings;
 	public TextureData textureData;
 
 	public Material terrainMaterial;
@@ -29,17 +30,17 @@ public class MapPreview : MonoBehaviour {
 	public void DrawMapInEditor() {
 		textureData.ApplyToMaterial (terrainMaterial);
 		textureData.UpdateMeshHeights (terrainMaterial, heightMapSettings.minHeight, heightMapSettings.maxHeight); //sending info to terrain shader
-		HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, Vector2.zero);
+		HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, Vector2.zero, biomeNoiseSettings);
 
 		if (drawMode == DrawMode.NoiseMap) {
 			DrawTexture (TextureGenerator.TextureFromHeightMap(heightMap));
 		} else if (drawMode == DrawMode.Mesh) {
 			DrawMesh (MeshGenerator.GenerateTerrainMesh (heightMap.values,meshSettings, editorPreviewLOD));
 		} else if (drawMode == DrawMode.FalloffMap) {
-			DrawTexture(TextureGenerator.TextureFromHeightMap(new HeightMap(FalloffGenerator.GenerateFalloffMap(meshSettings.numVertsPerLine),0,1,heightMap.biomeValues)));
+			DrawTexture(TextureGenerator.TextureFromHeightMap(new HeightMap(FalloffGenerator.GenerateFalloffMap(meshSettings.numVertsPerLine),0,1,heightMap.biomeNoiseMapValues)));
 		}
 		else if (drawMode == DrawMode.Biome) {
-			DrawTexture(TextureGenerator.TextureFromBiomeMap(heightMap.biomeValues));
+			DrawTexture(TextureGenerator.TextureFromBiomeMap(heightMap.biomeNoiseMapValues));
 		}
 	}
 
