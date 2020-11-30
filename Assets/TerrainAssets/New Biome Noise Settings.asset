@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: New Biome Noise Settings
   m_EditorClassIdentifier: Assembly-CSharp::BiomeNoiseSettings
-  autoUpdate: 1
-  scale: 1000
+  autoUpdate: 0
+  scale: 10000
   useBiomes: 1
   octaves: 1
   persistance: 0.6
@@ -22,3 +22,4 @@ MonoBehaviour:
   offset: {x: 0, y: 0}
   biomes:
   - {fileID: 11400000, guid: 9c2b6223fda2ccf43a6226a3eb3eda2b, type: 2}
+  - {fileID: 11400000, guid: 0d831672a6499474087918ccfc9ff845, type: 2}

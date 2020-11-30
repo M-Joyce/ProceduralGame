@@ -27,6 +27,9 @@ public static class HeightMapGenerator {
 		{
 			BiomeHeightMapSettings plainsBiome = biomeNoiseSettings.biomes[0];
 			AnimationCurve plainsHeightCurve_threadsafe = new AnimationCurve(plainsBiome.heightCurve.keys);
+
+			BiomeHeightMapSettings mountainsBiome = biomeNoiseSettings.biomes[1];
+			AnimationCurve mountainsHeightCurve_threadsafe = new AnimationCurve(mountainsBiome.heightCurve.keys);
 			//TODO Add biomes and use below
 
 			for (int i = 0; i < width; i++)
@@ -46,7 +49,8 @@ public static class HeightMapGenerator {
 					}
 					else if (biomeNoiseMapValues[i, j] >= 0.6 && biomeNoiseMapValues[i, j] < 0.9)
 					{
-						
+						//mountains
+						values[i, j] *= mountainsHeightCurve_threadsafe.Evaluate(values[i, j] - (mountainsBiome.useFalloff ? falloffMap[i, j] : 0)) * mountainsBiome.heightMultiplier;
 					}
 					else if (biomeNoiseMapValues[i, j] >= 0.9)
 					{
