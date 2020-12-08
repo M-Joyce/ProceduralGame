@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c9818e21c97f24cb0d57cea0decbf1, type: 3}
   m_Name: DefaultBiomeNoiseSettings
   m_EditorClassIdentifier: 
-  autoUpdate: 0
-  scale: 10000
+  autoUpdate: 1
+  scale: 1
   useBiomes: 1
-  octaves: 1
+  octaves: 2
   persistance: 0.5
   lacunarity: 2
   seed: 0
@@ -23,3 +23,4 @@ MonoBehaviour:
   biomes:
   - {fileID: 11400000, guid: e0b66aea53b8924418b8b48c395513c9, type: 2}
   - {fileID: 11400000, guid: 0d831672a6499474087918ccfc9ff845, type: 2}
+  - {fileID: 11400000, guid: 1580786ca49b1e642b9d7744c351009c, type: 2}

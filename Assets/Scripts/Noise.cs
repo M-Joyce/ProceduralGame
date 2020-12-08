@@ -9,7 +9,8 @@ public static class Noise {
 		float[,] noiseMap = new float[mapWidth,mapHeight];
 
 		System.Random prng = new System.Random (settings.seed);
-		Vector2[] octaveOffsets = new Vector2[settings.octaves];
+
+        Vector2[] octaveOffsets = new Vector2[settings.octaves];
 
 		float maxPossibleHeight = 0;
 		float amplitude = 1;
@@ -42,8 +43,9 @@ public static class Noise {
 					float sampleX = (x-halfWidth + octaveOffsets[i].x) / settings.scale * frequency;
 					float sampleY = (y-halfHeight + octaveOffsets[i].y) / settings.scale * frequency;
 
-					float perlinValue = Mathf.PerlinNoise (sampleX, sampleY) * 2 - 1;
-					noiseHeight += perlinValue * amplitude;
+					float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+
+                    noiseHeight += perlinValue * amplitude;
 
 					amplitude *= settings.persistance;
 					frequency *= settings.lacunarity;
@@ -98,3 +100,4 @@ public class NoiseSettings {
 		persistance = Mathf.Clamp01 (persistance);
 	}
 }
+

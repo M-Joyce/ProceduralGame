@@ -37,28 +37,24 @@ public static class TextureGenerator {
 		{
 			for (int x = 0; x < width; x++)
 			{
-				Color color;
-				if (biomeValues[x, y] >= 0 && biomeValues[x, y] < 0.3)
-				{
-					color = new Color(0.8f, 0.6f, 0.2f, 1f); //sand color
-				}
-				else if (biomeValues[x, y] >= 0.3 && biomeValues[x, y] < 0.6)
-                {
-					color = Color.red;
-				}
-				else if (biomeValues[x, y] >= 0.6 && biomeValues[x, y] < 0.9)
-				{
-					color = Color.gray;
-				}
-				else if (biomeValues[x, y] >= 0.9)
-				{
-					color = Color.green;
-				}	
-				else {
-					color = Color.black;
-				}
+				//Color color;
+				//if (biomeValues[x, y] >= 0 && biomeValues[x, y] < 0.33)
+				//{
+				//	color = new Color(0.8f, 0.6f, 0.2f, 1f); //sand color
+				//}
+				//else if (biomeValues[x, y] >= 0.33 && biomeValues[x, y] < 0.66)
+				//{
+				//	color = Color.green;
+				//}
+				//else if (biomeValues[x, y] >= 0.66 && biomeValues[x, y] <= 1)
+				//{
+				//	color = Color.gray;
+				//}
+				//else {
+				//	color = Color.black;
+				//}
 
-				colorMap[y * width + x] = color;
+				colorMap[y * width + x] = Color.Lerp(Color.black, Color.white, Mathf.InverseLerp(0, 1, biomeValues[x, y])); ;
 			}
 		}
 

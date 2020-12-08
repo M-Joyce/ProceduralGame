@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Unity.Mathematics;
 
 public static class BiomeNoiseMap {
 
@@ -8,7 +9,13 @@ public static class BiomeNoiseMap {
 		float[,] biomeNoiseMap = new float[mapWidth,mapHeight];
 
 		System.Random prng = new System.Random (settings.seed);
-		Vector2[] octaveOffsets = new Vector2[settings.octaves];
+        int seed = prng.Next(0,int.MaxValue);
+
+        FastNoise fastNoise = new FastNoise(seed); //FastNoise
+        fastNoise.SetCellularDistanceFunction(FastNoise.CellularDistanceFunction.Natural); //use natural distance function
+		fastNoise.SetCellularJitter(0.5f);
+
+        Vector2[] octaveOffsets = new Vector2[settings.octaves];
 
 		float maxPossibleHeight = 0;
 		float amplitude = 1;
@@ -34,23 +41,22 @@ public static class BiomeNoiseMap {
 				frequency = 1;
 				float noiseHeight = 0;
 
+				float cellularValue = 0;
+
 				for (int i = 0; i < settings.octaves; i++) {
 					float sampleX = (x-halfWidth + octaveOffsets[i].x) / settings.scale * frequency;
 					float sampleY = (y-halfHeight + octaveOffsets[i].y) / settings.scale * frequency;
+                    
+                    cellularValue = fastNoise.GetCellular(sampleX,sampleY); //get cellular noise value
 
-					float perlinValue = Mathf.PerlinNoise (sampleX, sampleY) * 2 - 1;
-					noiseHeight += perlinValue * amplitude;
+					noiseHeight += cellularValue * amplitude;
 
 					amplitude *= settings.persistance;
 					frequency *= settings.lacunarity;
 				}
 
-				biomeNoiseMap [x, y] = noiseHeight;
+				biomeNoiseMap[x, y] = Mathf.Clamp01(noiseHeight);
 
-				
-				float normalizedHeight = (biomeNoiseMap [x, y] + 1) / (2f * maxPossibleHeight / 1.3f); //the last division here can be changed a bit from 1-3, just play with it. 2f is nice.
-				biomeNoiseMap [x, y] = Mathf.SmoothStep(0, 1,normalizedHeight);
-				
 			}
 		}
 
