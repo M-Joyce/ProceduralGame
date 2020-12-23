@@ -33,7 +33,7 @@ public static class HeightMapGenerator {
 
 			BiomeHeightMapSettings desertsBiome = biomeNoiseSettings.biomes[2];
 			AnimationCurve desertsHeightCurve_threadsafe = new AnimationCurve(desertsBiome.heightCurve.keys);
-			//TODO Add biomes and use below
+			//TODO blend biome heights into each other
 
 			for (int i = 0; i < width; i++)
 			{

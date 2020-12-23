@@ -13,7 +13,13 @@ public static class BiomeNoiseMap {
 
         FastNoise fastNoise = new FastNoise(seed); //FastNoise
         fastNoise.SetCellularDistanceFunction(FastNoise.CellularDistanceFunction.Natural); //use natural distance function
-		fastNoise.SetCellularJitter(0.5f);
+		fastNoise.SetCellularJitter(0.99f);
+
+
+		///////
+		/// TODO
+		/// Split out Octaves,amplitude, lacunarity etc to be per biome. will need to put those into the biome terrain data assets, and change them below based on which biome.
+		//////
 
         Vector2[] octaveOffsets = new Vector2[settings.octaves];
 
@@ -52,7 +58,7 @@ public static class BiomeNoiseMap {
 					noiseHeight += cellularValue * amplitude;
 
 					amplitude *= settings.persistance;
-					frequency *= settings.lacunarity;
+					frequency *= settings.lacunarity;	
 				}
 
 				biomeNoiseMap[x, y] = Mathf.Clamp01(noiseHeight);

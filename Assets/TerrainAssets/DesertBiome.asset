@@ -15,7 +15,7 @@ MonoBehaviour:
   autoUpdate: 1
   biomeNoiseSettings: {fileID: 11400000, guid: 8b8318331f545694fb0a5551ed9432d8, type: 2}
   useFalloff: 0
-  heightMultiplier: 100
+  heightMultiplier: 300
   heightCurve:
     serializedVersion: 2
     m_Curve:
